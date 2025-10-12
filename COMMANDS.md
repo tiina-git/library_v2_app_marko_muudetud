@@ -52,3 +52,66 @@ export default defineConfig({
 });
 
 # welcome.blade.php on vaja uuesti teha (ilma tailwindita)
+
+Vaata faili: resources/views/welcome.blade.php
+
+# database logic
+Vaata sisu peale loomist 
+```
+php artisan make:model Author -m
+php artisan make:model Book -m
+```
+
+## Muuda migration faile
+
+database/migrations/DATE_create_authors_table.php
+```
+$table->string('name'); # Autori nimi
+$table->text('bio')->nullable(); # Autori biograafia
+```
+
+database/migrations/DATE_create_book_table.php
+```
+$table->foreignId('author_id')->constrained()->cascadeOnDelete(); # Seos teise mudeliga
+$table->string('title'); # Raanmatu pealkiri
+$table->year('published_year')->nullable(); # Avaldamise aasta
+$table->string('isbn')->nullable()->unique(); # ISBN kood unikaalne
+$table->unsignedInteger('pages')->nullable(); # Lehekülgede arv
+```
+
+## Loome admin kasutaja keskkonda (.env)
+Kohanda arendajale sobivaks. Näidis variant lisa ka **.env.example** faili
+```
+ADMIN_NAME=Administraator
+ADMIN_EMAIL=username@domain.com
+ADMIN_PASSWORD="P4r00l"
+```
+
+## Andmefailid kust lugeda autorid ja raamatuid
+
+Täienda, muuda vajadusel
+fail: database/seeders/data/authors.csv
+fail: database/seeders/data/books.csv
+
+## Loome seeder failid (Autorite ja Raamatute jaoks)
+```
+php artisan make:seeder AuthorsTableSeeder
+php artisan make:seeder BooksTableSeeder
+```
+
+Muuda faile
+
+```
+database\seeders\AuthorsTableSeeder.php
+database\seeders\BooksTableSeeder.php
+
+Järgnevat et mõlemad failid käivitatakse migreermisel ja lisaks et admin kasutaja ka lisatakse
+database\seeders\DatabaseSeeder.php
+```
+
+## Andmebaasi täitmine andmetega (enne migreermine)
+```
+php artisan migrate # Migreerimine
+php artisan db:seed # Tabelite täitmine andmetega
+php artisan migrate:fresh --seed # Kui teha tabelid uuesti ja täita andmetega
+```
