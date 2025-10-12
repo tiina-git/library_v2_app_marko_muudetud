@@ -19,7 +19,7 @@ php artisan ui bootstrap --auth
 # Paigalda NPM sõltuvused
 npm install
 
-# Kompileeri Frontend aarad (CTRL+C kui tehtud)
+# Kompileeri Frontend varad (CTRL+C kui tehtud)
 npm run dev
 
 # Andmebaasi muudatused (.env)
@@ -56,7 +56,7 @@ export default defineConfig({
 Vaata faili: resources/views/welcome.blade.php
 
 # database logic
-Vaata sisu peale loomist 
+Vaata/muuda sisu peale loomist 
 ```
 php artisan make:model Author -m
 php artisan make:model Book -m
@@ -115,3 +115,39 @@ php artisan migrate # Migreerimine
 php artisan db:seed # Tabelite täitmine andmetega
 php artisan migrate:fresh --seed # Kui teha tabelid uuesti ja täita andmetega
 ```
+
+# Avalik vaade (public_view)
+
+Avaliku vaate routed routes\web.php
+```
+Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
+Route::get('/authors/{author}', [AuthorController::class, 'show'])->name('authors.show');
+
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
+```
+
+## Kontrollerid
+
+Loome kontrollerid. Kontrolleid tulevad alam kausta Public (app\Http\Controllers\Public)
+```
+php artisan make:controller Public/AuthorController
+php artisan make:controller Public/BookController
+```
+
+## Muudame olemasolevaid vaateid ja teeme vajadusel uued vaated
+resources\views\layouts\app.blade.php
+resources\views\layouts\nav.blade.php
+resources\css\app.css # Lisatud .testing klass
+
+resources\views\public\authors\index.blade.php
+resources\views\public\authors\show.blade.php
+resources\views\public\books\index.blade.php
+resources\views\public\books\show.blade.php
+
+## Muutame pagination osa Bootstrap jaoks.
+
+  Fail: app\Providers\AppServiceProvider.php
+  Lisa: Paginator::useBootstrapFive(); # Meetodis boot()
+Import: use Illuminate\Pagination\Paginator;
+
