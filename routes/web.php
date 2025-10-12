@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Admin\AdminAuthorController;
+use App\Http\Controllers\Admin\AdminBookController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Public\AuthorController;
 use App\Http\Controllers\Public\BookController;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +17,10 @@ Route::get('/', function () {
 # app/Http/Controllers/Auth/
 Auth::routes();
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+// tänu __invoke() meetodile pole vaja meetodit lisada (index, show, create ...)
+Route::get('/dashboard', DashboardController::class)
+    ->middleware('auth')
+    ->name('dashboard');
 
 # Avaliku vaate route-d
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
@@ -23,3 +28,8 @@ Route::get('/authors/{author}', [AuthorController::class, 'show'])->name('author
 
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
+
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('authors', AdminAuthorController::class)->except(['show']);
+    Route::resource('books',   AdminBookController::class)->except(['show']);
+});

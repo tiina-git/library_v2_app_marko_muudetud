@@ -151,3 +151,13 @@ resources\views\public\books\show.blade.php
   Lisa: Paginator::useBootstrapFive(); # Meetodis boot()
 Import: use Illuminate\Pagination\Paginator;
 
+# Administraatori osa
+
+Logimine peaks töötama, kuid kuna asjad on nüüd poolikud ja uuendatud, siis enne edasi toimetamist on vaja routes korda teha ja lisada uued. Testida saab kui mõned asjad välja kommenteerida. Aga alustame siiski kontrolleritega.
+
+## Loo admin lehe kontrollerid
+```
+# (eeldab, et mudelid Author ja Book on olemas)
+php artisan make:controller Admin/AdminAuthorController --resource --model=Author
+php artisan make:controller Admin/AdminBookController   --resource --model=Book
+```

@@ -32,9 +32,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/admin/books') }}">Raamatud</a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link" href="{{ route('password.edit') }}">Muuda parooli</a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
