@@ -100,7 +100,6 @@ php artisan make:seeder BooksTableSeeder
 ```
 
 Muuda faile
-
 ```
 database\seeders\AuthorsTableSeeder.php
 database\seeders\BooksTableSeeder.php
@@ -161,3 +160,19 @@ Logimine peaks töötama, kuid kuna asjad on nüüd poolikud ja uuendatud, siis 
 php artisan make:controller Admin/AdminAuthorController --resource --model=Author
 php artisan make:controller Admin/AdminBookController   --resource --model=Book
 ```
+
+## Loo admin lehe vaated
+```resources\views\admin\authors\_form.blade.php
+resources\views\admin\authors\create.blade.php
+resources\views\admin\authors\edit.blade.php
+resources\views\admin\authors\index.blade.php
+
+resources\views\admin\books\_form.blade.php
+resources\views\admin\books\create.blade.php
+resources\views\admin\books\edit.blade.php
+resources\views\admin\books\index.blade.php
+```
+
+## home => dashboard
+
+Muudetud home link ja vaade dashboardiks. Kontroller ka ja routes/web.php muudatus. Nagu eelmisel tunnil tehtud.
