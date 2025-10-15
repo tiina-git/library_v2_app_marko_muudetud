@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthorController;
 use App\Http\Controllers\Admin\AdminBookController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\ChangePasswordController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Public\AuthorController;
 use App\Http\Controllers\Public\BookController;
@@ -31,13 +32,19 @@ Route::get('/authors/{author}', [AuthorController::class, 'show'])->name('author
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
 
-# Administraatori vaated
+Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
+    ->name('oauth.google.redirect');
+
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
+    ->name('oauth.google.callback');
+
+# Administraatori vaate osad
 Route::middleware(['auth', 'force.password.change'])->prefix('admin')->name('admin.')->group(function () {
     // Adminile mõeldud osa
     Route::middleware('can:manage-users')->group(function () {
     // Autorid ja raamatud (lisa, muuda, eemalda)
-    Route::resource('authors', AdminAuthorController::class)->except(['show']);
-    Route::resource('books',   AdminBookController::class)->except(['show']);
+        Route::resource('authors', AdminAuthorController::class)->except(['show']);
+        Route::resource('books',   AdminBookController::class)->except(['show']);
  
     // Loo ja salvesta uus kasutaja
     Route::get('users/create', [UserController::class, 'create'])->name('users.create');
