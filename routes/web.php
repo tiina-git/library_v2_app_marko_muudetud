@@ -47,8 +47,12 @@ Route::middleware(['auth', 'force.password.change'])->prefix('admin')->name('adm
         Route::resource('books',   AdminBookController::class)->except(['show']);
  
     // Loo ja salvesta uus kasutaja
+    Route::get('users', [UserController::class, 'index'])->name('users.index'); # Lisasin
     Route::get('users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
+    Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy'); # Lisasin
+
+    
     });
         
     // Parooli muutmise vorm ja uuendamine

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -36,5 +38,16 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
+    }
+
+    /**
+     * Called after the user is authenticated. with password
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        // Mark that this was a local (password) login and save timestamp
+        $user->last_login_method = User::LOGIN_METHOD_PASSWORD;
+        $user->last_login_at = now();
+        $user->save();
     }
 }

@@ -74,6 +74,12 @@
                                         <i class="fa-solid fa-book me-2" aria-hidden="true"></i> Raamatud
                                     </a>
                                 </li>
+                                {{-- Kasutajate menüü --}}
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin.users.index') }}">
+                                        <i class="fa-solid fa-book me-2" aria-hidden="true"></i> Kasutajad
+                                    </a>
+                                </li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('admin.users.create') }}">
                                         <i class="fa-solid fa-user-plus me-2" aria-hidden="true"></i> Uus kasutaja
