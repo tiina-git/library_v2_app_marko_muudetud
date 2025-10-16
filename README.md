@@ -57,5 +57,64 @@ Tegevused mis on tehtud, on [COMMANDS.md](COMMANDS.md) failis.
     php artisan serve
 ```
 
+Muudatused
 
+#  16.oktoober
+1. Sisselogimine parooliga, kajastamine andmebaasis.
+
+LoginController.php
+	protected function authenticated(Request $request, $user){...}
+
+2. Kasutajate kontode vaatamine ja kustutamine Administraatorina
+UserController.php
+	public function index(){...}
+	public function destroy(User $user){...}
+	
+Uus fail "Kasutajad" 
+	resources/views/admin/users/index.blade.php
+
+Web.php	- Routes update
+	[UserController::class, 'index']
+	[UserController::class, 'destroy'])
+	
+nav.blade.php - Rippmenüüsse link juurde "Kasutajad"
+	 <a class="dropdown-item" href="{{ route('admin.users.index') }}">
+	
+3. Raamatute tabeli vaade sisselogitud kasutajale
+Uus fail "Raamatute nimekiri"
+	resources/views/user/bookslist.blade.php
+
+nav.blade.php - Rippmenüüsse link juurde "Raamatute nimekiri"
+	<a class="dropdown-item" href="{{ route('bookslist') }}">
+	
+BookController.phph
+	 public function userIndex(Request $request){...}
+	 
+Web.php	- Routes update, bookslist.blade
+	[BookController::class, 'userIndex']
+	
+4. Raamatute otsimine, min 3 märki
+	index.blade.php	
+	public function index(Request $request) {...}
+	
+5. Raamatute import CSV failist, Admin
+Uus fail "Raamatute import"
+	resources/views/admin/books/import.blade.php
+	
+nav.blade.php - Rippmenüüsse link juurde "Raamatute import"
+	<a class="dropdown-item" href="{{ route('admin.books.import') }}">
+	
+AdminBooksController.php
+	public function importForm(){...}
+	public function import(Request $request){...}
+	
+Web.php	- Routes update
+[AdminBookController::class, 'importForm']
+[AdminBookController::class, 'import']
+
+6. Süsteemikonto Admin, 
+Muutisn andmeid '.env' failis , panin 'tiina.uuk@kehtna.edu.ee' e-maili 
+Tegin andmebaasi uuesti ja liasin kõik andmed hiljem tagasi.
+Lisaks (Marko, marko.livental@rako.edu.ee, Parool: 1...8)
+	
 
