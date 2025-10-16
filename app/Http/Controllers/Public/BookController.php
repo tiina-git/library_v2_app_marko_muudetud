@@ -66,12 +66,7 @@ class BookController extends Controller {
 
     # Kasutaja, kes on sisse logitud aga puuduvad admin õigused
     public function userIndex(Request $request){
-        $user = $request->user();
-        // block admins — this view is for non-admin users only
-        if (! $user || ($user->is_admin ?? false)) {
-            abort(403);
-        }
-
+        // Allow any authenticated user (admin or non-admin) to view the list
         $sort = $request->get('sort', 'title'); // 'title' or 'author'
         $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
 

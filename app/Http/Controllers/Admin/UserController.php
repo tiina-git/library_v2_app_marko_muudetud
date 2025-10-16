@@ -19,12 +19,14 @@ class UserController extends Controller{
             'name' => ['required','string','max:255'],
             'email' => ['required','email','unique:users,email'],
             'password' => ['required','confirmed',Password::defaults()],
+            'is_admin' => ['nullable','boolean'],
         ]);
         
         User::create([                      // Loo kasutaja
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'is_admin' => (bool)($data['is_admin'] ?? false),
             'must_change_password' => true, // Märgi, et kasutaja peab parooli muutma
         ]);
         return redirect()->route('admin.users.create')->with('status', 'Kasutaja on loodud!');
