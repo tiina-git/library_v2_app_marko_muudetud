@@ -8,27 +8,44 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller {
     public function index(Request $request) {
-        $q = trim((string)$request->get('q', ''));
+        $q = trim((string) $request->get('q', ''));
+        $isNumeric = $q !== '' && ctype_digit($q);
 
         $query = Book::query()->with('author');
-        // Otsing raamatuid raamatu nime, aasta, lk arvu, või autori nime järgi
-        if ($q !== '' && mb_strlen($q) >= 3) { // miinimum sümbolite arv 3 tähemärki
-            $query->where(function ($sub) use ($q) {
+
+        // Otsing: kõik olulised väljad raamatust ja autorist, v.a. raamatu 'isbn'
+        if ($q !== '' && mb_strlen($q) >= 3) { // miinimum 3 märki
+            $query->where(function ($sub) use ($q, $isNumeric) {
+                // Raamat (isbn on teadlikult välja jäetud)
                 $sub->where('title', 'like', '%' . $q . '%')
                     ->orWhere('published_year', 'like', '%' . $q . '%')
                     ->orWhere('pages', 'like', '%' . $q . '%')
                     ->orWhere('created_at', 'like', '%' . $q . '%')
                     ->orWhere('updated_at', 'like', '%' . $q . '%')
-                    ->orWhereHas('author', function ($a) use ($q) {
-                        $a->where('name', 'like', '%' . $q . '%');
+
+                    // Autor: nimi, bio, ajatempli väljad
+                    ->orWhereHas('author', function ($a) use ($q, $isNumeric) {
+                        $a->where(function ($aa) use ($q) {
+                            $aa->where('name', 'like', '%' . $q . '%')
+                               ->orWhere('bio', 'like', '%' . $q . '%')
+                               ->orWhere('created_at', 'like', '%' . $q . '%')
+                               ->orWhere('updated_at', 'like', '%' . $q . '%');
+                        });
+
+                        // Numbrilise päringu puhul aastapõhised vasted ka autori ajatemplitelt
+                        if ($isNumeric) {
+                            $a->orWhereYear('created_at', (int) $q)
+                              ->orWhereYear('updated_at', (int) $q);
+                        }
                     });
 
-                if (ctype_digit($q)) {      // kui tekst on number
-                    $sub->orWhere('author_id', (int)$q)
-                        ->orWhere('published_year', (int)$q)
-                        ->orWhere('pages', (int)$q)
-                        ->orWhereYear('created_at', (int)$q)
-                        ->orWhereYear('updated_at', (int)$q);
+                // Numbrilise päringu korral täpsed/“YEAR()” vasted raamatu väljadelt
+                if ($isNumeric) {
+                    $sub->orWhere('author_id', (int) $q)
+                        ->orWhere('published_year', (int) $q)
+                        ->orWhere('pages', (int) $q)
+                        ->orWhereYear('created_at', (int) $q)
+                        ->orWhereYear('updated_at', (int) $q);
                 }
             });
         }

@@ -7,13 +7,13 @@
 
     <form method="GET" action="{{ route('books.index') }}" class="mb-3" role="search" id="live-search-form">
         <div class="input-group">
-            <input type="search" name="q" value="{{ old('q', $q ?? request('q')) }}" class="form-control" placeholder="Otsi (min 3 märki): autor, pealkiri, aasta, loodud/uuendatud, lehekülgi" minlength="3" oninput="this.value=this.value.trimStart()" id="search-input" autocomplete="off">
+            <input type="search" name="q" value="{{ old('q', $q ?? request('q')) }}" class="form-control" placeholder="Otsingusõna" minlength="3" oninput="this.value=this.value.trimStart()" id="search-input" autocomplete="off">
             <button class="btn btn-primary" type="submit">Otsi</button>
             @if(($q ?? request('q')))
                 <a href="{{ route('books.index') }}" class="btn btn-outline-secondary">Tühjenda</a>
             @endif
         </div>
-        <div class="form-text">Tühikud eemaldatakse algusest; otsing aktiveerub alates 3 märgist.</div>
+        <div class="form-text"> min 3 tähemärki</div>
     </form>
 
     <div id="results-meta" class="mb-2">
