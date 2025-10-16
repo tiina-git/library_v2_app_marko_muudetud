@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Author;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use SplFileObject;
 
 class AdminBookController extends Controller {
     /**
@@ -89,5 +91,109 @@ class AdminBookController extends Controller {
 
         return redirect()->route('admin.books.index')
             ->with('status', 'Raamat kustutatud.');
+    }
+
+    
+    /**
+     * Show CSV import form (admin only via routes).
+     */
+    public function importForm()
+    {
+        return view('admin.books.import');
+    }
+
+    /**
+     * Process uploaded CSV and create/update authors and books.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'csv' => ['required', 'file', 'mimes:csv,txt', 'max:5120'],
+        ]);
+
+        $file = $request->file('csv');
+        $path = $file->getRealPath();
+
+        $fp = new SplFileObject($path);
+        $fp->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY);
+        $fp->setCsvControl(';');
+
+        $created = 0;
+        $updated = 0;
+        $skipped = 0;
+
+        DB::transaction(function () use ($fp, &$created, &$updated, &$skipped) {
+            // cache existing authors by exact name to avoid repeated queries
+            $authors = Author::pluck('id', 'name')->toArray(); // name => id
+
+            $isHeader = true;
+            foreach ($fp as $row) {
+                if ($row === [null] || $row === false) {
+                    continue;
+                }
+
+                if ($isHeader) { $isHeader = false; continue; } // skip header
+
+                // Expecting CSV: Autor;Raamatunimi;Aasta;Isbn;Lehekülgi
+                [$authorName, $title, $year, $isbn, $pages] = array_pad($row, 5, '');
+
+                $authorName = trim((string)$authorName);
+                $title = trim((string)$title);
+                $year = trim((string)$year);
+                $isbn = trim((string)$isbn);
+                $pages = trim((string)$pages);
+
+                if ($title === '') {
+                    $skipped++;
+                    continue;
+                }
+
+                // ensure author exists
+                if ($authorName === '') {
+                    // optional: skip or set null author; here skip
+                    $skipped++;
+                    continue;
+                }
+
+                if (!isset($authors[$authorName])) {
+                    $newAuthor = Author::create(['name' => $authorName]);
+                    $authorId = $newAuthor->id;
+                    $authors[$authorName] = $authorId;
+                } else {
+                    $authorId = $authors[$authorName];
+                }
+
+                $bookData = [
+                    'author_id'      => $authorId,
+                    'title'          => $title,
+                    'published_year' => $year !== '' ? (int)$year : null,
+                    'isbn'           => $isbn !== '' ? $isbn : null,
+                    'pages'          => $pages !== '' ? (int)$pages : null,
+                ];
+
+                // prefer unique by ISBN when present
+                if (!empty($bookData['isbn'])) {
+                    $book = Book::updateOrCreate(
+                        ['isbn' => $bookData['isbn']],
+                        $bookData
+                    );
+                } else {
+                    // otherwise match by title + author
+                    $book = Book::updateOrCreate(
+                        ['title' => $bookData['title'], 'author_id' => $bookData['author_id']],
+                        $bookData
+                    );
+                }
+
+                if ($book->wasRecentlyCreated) {
+                    $created++;
+                } else {
+                    $updated++;
+                }
+            }
+        });
+
+        return redirect()->route('admin.books.index')
+            ->with('status', "Import lõpetatud. Loodud: {$created}, uuendatud: {$updated}, vahele jäetud: {$skipped}.");
     }
 }

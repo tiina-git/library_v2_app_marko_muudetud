@@ -57,7 +57,10 @@ Route::middleware(['auth', 'force.password.change'])->prefix('admin')->name('adm
     Route::post('users', [UserController::class, 'store'])->name('users.store');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy'); # Lisasin
 
-    
+    // CSV failist raamatute import 
+    Route::get('books/import', [AdminBookController::class, 'importForm'])->name('books.import.form');# Lisasin
+    Route::post('books/import', [AdminBookController::class, 'import'])->name('books.import'); # Lisasin
+
     });
         
     // Parooli muutmise vorm ja uuendamine

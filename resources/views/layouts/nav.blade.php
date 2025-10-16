@@ -79,6 +79,12 @@
                                         <i class="fa-solid fa-book me-2" aria-hidden="true"></i> Raamatud
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin.books.import') }}">
+                                        <i class="fa-solid fa-book me-2" aria-hidden="true"></i> Raamatute import
+                                    </a>
+                                </li>
+
                                 {{-- Kasutajate menüü --}}
                                 <li>
                                     <a class="dropdown-item" href="{{ route('admin.users.index') }}">
