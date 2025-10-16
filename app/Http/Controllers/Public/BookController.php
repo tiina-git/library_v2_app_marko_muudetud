@@ -7,14 +7,56 @@ use App\Models\Book;
 use Illuminate\Http\Request;
 
 class BookController extends Controller {
-    public function index() {
-        // Kuvame raamatud koos autori infoga
-        $books = Book::query()
-            ->with('author')
-            ->orderBy('title')
-            ->paginate(8);
+    public function index(Request $request) {
+        $q = trim((string) $request->get('q', ''));
+        $isNumeric = $q !== '' && ctype_digit($q);
 
-        return view('public.books.index', compact('books'));
+        $query = Book::query()->with('author');
+
+        // Otsing: kõik olulised väljad raamatust ja autorist, v.a. raamatu 'isbn'
+        if ($q !== '' && mb_strlen($q) >= 3) { // miinimum 3 märki
+            $query->where(function ($sub) use ($q, $isNumeric) {
+                // Raamat (isbn on teadlikult välja jäetud)
+                $sub->where('title', 'like', '%' . $q . '%')
+                    ->orWhere('published_year', 'like', '%' . $q . '%')
+                    ->orWhere('pages', 'like', '%' . $q . '%')
+                    ->orWhere('created_at', 'like', '%' . $q . '%')
+                    ->orWhere('updated_at', 'like', '%' . $q . '%')
+
+                    // Autor: nimi, bio, ajatempli väljad
+                    ->orWhereHas('author', function ($a) use ($q, $isNumeric) {
+                        $a->where(function ($aa) use ($q) {
+                            $aa->where('name', 'like', '%' . $q . '%')
+                               ->orWhere('bio', 'like', '%' . $q . '%')
+                               ->orWhere('created_at', 'like', '%' . $q . '%')
+                               ->orWhere('updated_at', 'like', '%' . $q . '%');
+                        });
+
+                        // Numbrilise päringu puhul aastapõhised vasted ka autori ajatemplitelt
+                        if ($isNumeric) {
+                            $a->orWhereYear('created_at', (int) $q)
+                              ->orWhereYear('updated_at', (int) $q);
+                        }
+                    });
+
+                // Numbrilise päringu korral täpsed/“YEAR()” vasted raamatu väljadelt
+                if ($isNumeric) {
+                    $sub->orWhere('author_id', (int) $q)
+                        ->orWhere('published_year', (int) $q)
+                        ->orWhere('pages', (int) $q)
+                        ->orWhereYear('created_at', (int) $q)
+                        ->orWhereYear('updated_at', (int) $q);
+                }
+            });
+        }
+
+        $books = $query->orderBy('title')->paginate(8)->withQueryString(); // tulemuste arv lehel
+
+        if ($request->boolean('partial') || $request->ajax()) {
+            return view('public.books._results', compact('books', 'q'));
+        }
+
+        return view('public.books.index', compact('books', 'q'));
     }
 
     public function show(Book $book) {

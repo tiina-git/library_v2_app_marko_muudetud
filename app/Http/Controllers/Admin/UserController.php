@@ -34,9 +34,9 @@ class UserController extends Controller{
     public function index(){
         $users = User::query()
             ->where('id', '<>', 1)            // väldi id = 1
-            ->where(function($q) {
-                $q->whereNull('is_admin')->orWhere('is_admin', false); // ära näita administraatoreid
-            })
+            // ->where(function($q) {
+            //     $q->whereNull('is_admin')->orWhere('is_admin', false); // ära näita administraatoreid
+            // })
             ->orderBy('name')
             ->paginate(15);
 
