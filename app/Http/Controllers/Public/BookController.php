@@ -7,14 +7,39 @@ use App\Models\Book;
 use Illuminate\Http\Request;
 
 class BookController extends Controller {
-    public function index() {
-        // Kuvame raamatud koos autori infoga
-        $books = Book::query()
-            ->with('author')
-            ->orderBy('title')
-            ->paginate(8);
+    public function index(Request $request) {
+        $q = trim((string)$request->get('q', ''));
 
-        return view('public.books.index', compact('books'));
+        $query = Book::query()->with('author');
+        // Otsing raamatuid raamatu nime, aasta, lk arvu, või autori nime järgi
+        if ($q !== '' && mb_strlen($q) >= 3) { // miinimum sümbolite arv 3 tähemärki
+            $query->where(function ($sub) use ($q) {
+                $sub->where('title', 'like', '%' . $q . '%')
+                    ->orWhere('published_year', 'like', '%' . $q . '%')
+                    ->orWhere('pages', 'like', '%' . $q . '%')
+                    ->orWhere('created_at', 'like', '%' . $q . '%')
+                    ->orWhere('updated_at', 'like', '%' . $q . '%')
+                    ->orWhereHas('author', function ($a) use ($q) {
+                        $a->where('name', 'like', '%' . $q . '%');
+                    });
+
+                if (ctype_digit($q)) {      // kui tekst on number
+                    $sub->orWhere('author_id', (int)$q)
+                        ->orWhere('published_year', (int)$q)
+                        ->orWhere('pages', (int)$q)
+                        ->orWhereYear('created_at', (int)$q)
+                        ->orWhereYear('updated_at', (int)$q);
+                }
+            });
+        }
+
+        $books = $query->orderBy('title')->paginate(8)->withQueryString(); // tulemuste arv lehel
+
+        if ($request->boolean('partial') || $request->ajax()) {
+            return view('public.books._results', compact('books', 'q'));
+        }
+
+        return view('public.books.index', compact('books', 'q'));
     }
 
     public function show(Book $book) {

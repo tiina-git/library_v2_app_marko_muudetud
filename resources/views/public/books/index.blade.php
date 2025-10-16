@@ -5,31 +5,71 @@
 @section('content')
     <h1 class="mb-4">Raamatud</h1>
 
-    @if($books->count())
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-            @foreach($books as $book)
-                <div class="col">
-                    <div class="card h-100 shadow-sm position-relative">
-                        <div class="card-body">
-                            <h2 class="h6 card-title mb-1">{{ $book->title }}</h2>
-                            <p class="card-text text-muted mb-0">
-                                {{ $book->author?->name ?? 'Tundmatu autor' }}
-                                @if($book->year)
-                                    · {{ $book->year }}
-                                @endif
-                            </p>
-                        </div>
-                        <a href="{{ route('books.show', $book) }}" class="stretched-link"
-                           aria-label="Vaata: {{ $book->title }}"></a>
-                    </div>
-                </div>
-            @endforeach
+    <form method="GET" action="{{ route('books.index') }}" class="mb-3" role="search" id="live-search-form">
+        <div class="input-group">
+            <input type="search" name="q" value="{{ old('q', $q ?? request('q')) }}" class="form-control" placeholder="Otsi (min 3 märki): autor, pealkiri, aasta, loodud/uuendatud, lehekülgi" minlength="3" oninput="this.value=this.value.trimStart()" id="search-input" autocomplete="off">
+            <button class="btn btn-primary" type="submit">Otsi</button>
+            @if(($q ?? request('q')))
+                <a href="{{ route('books.index') }}" class="btn btn-outline-secondary">Tühjenda</a>
+            @endif
         </div>
+        <div class="form-text">Tühikud eemaldatakse algusest; otsing aktiveerub alates 3 märgist.</div>
+    </form>
 
-        <div class="mt-4 text-end">
-            {{ $books->links() }}
-        </div>
-    @else
-        <p>Raamatuid ei leitud.</p>
-    @endif
+    <div id="results-meta" class="mb-2">
+        @if(isset($q) && strlen($q) >= 3)
+            <div class="text-muted">Tulemusi: {{ $books->total() }} — päring: "{{ $q }}"</div>
+        @endif
+    </div>
+
+    <div id="results-container">
+        @include('public.books._results', ['books' => $books])
+    </div>
+
+    <script>
+    (function(){
+        const form = document.getElementById('live-search-form');
+        const input = document.getElementById('search-input');
+        const container = document.getElementById('results-container');
+        const meta = document.getElementById('results-meta');
+
+        let controller;
+        let timeoutId;
+
+        function updateResultsHTML(html){
+            container.innerHTML = html;
+        }
+        function updateMetaText(text){
+            meta.innerHTML = text ? '<div class="text-muted">' + text + '</div>' : '';
+        }
+
+        async function fetchResults(q){
+            try {
+                if (controller) controller.abort();
+                controller = new AbortController();
+                const params = new URLSearchParams({ q, partial: '1' });
+                const res = await fetch(`${form.action}?${params.toString()}`, { headers: { 'X-Requested-With':'XMLHttpRequest' }, signal: controller.signal });
+                const html = await res.text();
+                updateResultsHTML(html);
+                updateMetaText(q.length >= 3 ? `Tulemusi: ${document.querySelectorAll('#results-container .card').length} — päring: "${q}"` : '');
+                history.replaceState(null, '', `${form.action}?q=${encodeURIComponent(q)}`);
+            } catch (e) { /* ignore aborted */ }
+        }
+
+        function handleInput(){
+            const q = input.value.trim();
+            clearTimeout(timeoutId);
+            if (q.length < 3) {
+                // when less than 3, load default (no filter)
+                updateMetaText('');
+                fetchResults('');
+                return;
+            }
+            timeoutId = setTimeout(() => fetchResults(q), 250); // debounce
+        }
+
+        input.addEventListener('input', handleInput);
+        form.addEventListener('submit', function(ev){ ev.preventDefault(); handleInput(); });
+    })();
+    </script>
 @endsection
