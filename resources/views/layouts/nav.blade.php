@@ -56,6 +56,11 @@
                                 </a>
                             </li>
                             <li>
+                                 <a class="dropdown-item" href="{{ route('bookslist') }}">
+                                    <i class="fa-solid fa-gauge-high me-2" aria-hidden="true"></i> Raamatute nimekiri
+                                </a>
+                            </li>
+                            <li>
                                 <a class="dropdown-item" href="{{ route('admin.password.change') }}">
                                     <i class="fa-solid fa-key me-2" aria-hidden="true"></i> Muuda parooli
                                 </a>

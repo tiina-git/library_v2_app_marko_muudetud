@@ -38,6 +38,11 @@ Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
     ->name('oauth.google.callback');
 
+# Sisse logitud kasutajad, kes pole admin õigustega
+Route::get('/user/bookslist', [BookController::class, 'userIndex']) # Lisasin
+    ->middleware('auth') // only logged-in users
+    ->name('bookslist');
+
 # Administraatori vaate osad
 Route::middleware(['auth', 'force.password.change'])->prefix('admin')->name('admin.')->group(function () {
     // Adminile mõeldud osa
