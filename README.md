@@ -116,5 +116,6 @@ Web.php	- Routes update
 Muutisn andmeid '.env' failis , panin 'tiina.uuk@kehtna.edu.ee' e-maili 
 Tegin andmebaasi uuesti ja liasin kõik andmed hiljem tagasi.
 Lisaks (Marko, marko.livental@rako.edu.ee, Parool: 1...8)
+Lisasin administraatori check box-i.
 	
 

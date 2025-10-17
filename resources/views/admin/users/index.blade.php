@@ -16,11 +16,10 @@
             <table class="table mb-0">
                 <thead>
                     <tr>
-                        <th>Nimi</th>
+                        <th>Kasutajanimi</th>
                         <th>E-post</th>
-                        <th>Viimane sisse</th>
-                        <th>Peab parooli muutma</th>
-                        <th></th>
+                        <th>Sisse logimine</th>
+                        <th>Parool muutmata</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -28,11 +27,7 @@
                     <tr>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
-                        <td>
-                            {{ $user->last_login_method ? ucfirst($user->last_login_method) : '-' }}
-                            <br>
-                            <small class="text-muted">{{ $user->last_login_at ? $user->last_login_at->diffForHumans() : '-' }}</small>
-                        </td>
+                        <td>{{ $user->last_login_at ? $user->last_login_at->format('d.m.Y H:i:s') : '—' }}</td>
                         <td>
                             @if($user->must_change_password)
                                 <span class="badge bg-warning text-dark">Jah</span>

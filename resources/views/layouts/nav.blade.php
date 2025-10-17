@@ -11,6 +11,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{{ route('books.index') }}">Raamatud</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('authors.index') }}">Autorid</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('search') }}">Otsing</a></li>
             </ul>
 
             {{-- Auth plokk --}}

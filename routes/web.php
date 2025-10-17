@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Public\AuthorController;
 use App\Http\Controllers\Public\BookController;
+use App\Http\Controllers\Public\SearchController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,8 @@ Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
     ->name('oauth.google.callback');
 
+Route::get('/search', [SearchController::class, 'index'])->name('search'); # Lisasin
+
 # Sisse logitud kasutajad, kes pole admin õigustega
 Route::get('/user/bookslist', [BookController::class, 'userIndex']) # Lisasin
     ->middleware('auth') // only logged-in users
@@ -60,7 +63,6 @@ Route::middleware(['auth', 'force.password.change'])->prefix('admin')->name('adm
     // CSV failist raamatute import 
     Route::get('books/import', [AdminBookController::class, 'importForm'])->name('books.import.form');# Lisasin
     Route::post('books/import', [AdminBookController::class, 'import'])->name('books.import'); # Lisasin
-
     });
         
     // Parooli muutmise vorm ja uuendamine
