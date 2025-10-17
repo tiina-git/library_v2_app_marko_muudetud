@@ -34,6 +34,7 @@
                         </th>
                         <th style="width:120px;">Aasta</th>
                         <th style="width:140px;">ISBN</th>
+                        <th style="width:120px;">Lk</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,6 +50,7 @@
                             </td>
                             <td>{{ $book->published_year ?? '-' }}</td>
                             <td>{{ $book->isbn ?? '-' }}</td>
+                            <td>{{ $book->pages ?? '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
