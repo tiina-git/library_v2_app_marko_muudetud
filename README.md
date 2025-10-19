@@ -94,7 +94,7 @@ Web.php	- Routes update, bookslist.blade
 	[BookController::class, 'userIndex']
 	
 4. Raamatute otsimine, min 3 märki
-	index.blade.php	
+	search.blade.php	
 	public function index(Request $request) {...}
 	
 5. Raamatute import CSV failist, Admin
