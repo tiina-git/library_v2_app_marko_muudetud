@@ -92,7 +92,7 @@ Uus kontroller "Otsing"
 Uus fail "Otsing" 
     resources/views/public/search.blade.php
 	    public function index(Request $request) {...}
-resources/views/layouts/nav.blade.php - Mnüüsse link juurde "Otsing"
+resources/views/layouts/nav.blade.php - Menüüsse link juurde "Otsing"
 Web.php	- Routes update, search.blade
  [SearchController::class, 'index']
 	
