@@ -61,7 +61,6 @@ Muudatused
 
 #  16.oktoober
 1. Sisselogimine parooliga, kajastamine andmebaasis.
-
 LoginController.php
 	protected function authenticated(Request $request, $user){...}
 
@@ -69,45 +68,40 @@ LoginController.php
 UserController.php
 	public function index(){...}
 	public function destroy(User $user){...}
-	
 Uus fail "Kasutajad" 
 	resources/views/admin/users/index.blade.php
-
 Web.php	- Routes update
 	[UserController::class, 'index']
 	[UserController::class, 'destroy'])
-	
-nav.blade.php - Rippmenüüsse link juurde "Kasutajad"
+resources/views/layouts/nav.blade.php Rippmenüüsse link juurde "Kasutajad"
 	 <a class="dropdown-item" href="{{ route('admin.users.index') }}">
 	
 3. Raamatute tabeli vaade sisselogitud kasutajale
 Uus fail "Raamatute nimekiri"
 	resources/views/user/bookslist.blade.php
-
-nav.blade.php - Rippmenüüsse link juurde "Raamatute nimekiri"
+resources/views/layouts/nav.blade.php - Rippmenüüsse link juurde "Raamatute nimekiri"
 	<a class="dropdown-item" href="{{ route('bookslist') }}">
-	
 BookController.phph
 	 public function userIndex(Request $request){...}
-	 
 Web.php	- Routes update, bookslist.blade
 	[BookController::class, 'userIndex']
 	
 4. Raamatute otsimine, min 3 märki
-	search.blade.php	
-	public function index(Request $request) {...}
+app/Http/Controllers/Public/SearchController.php
+Uus fail "Otsing" 
+    resources/views/public/search.blade.php
+	    public function index(Request $request) {...}
+Web.php	- Routes update, search.blade
+ [SearchController::class, 'index']
 	
-5. Raamatute import CSV failist, Admin
+6. Raamatute import CSV failist, Admin
 Uus fail "Raamatute import"
 	resources/views/admin/books/import.blade.php
-	
-nav.blade.php - Rippmenüüsse link juurde "Raamatute import"
+resources/views/layouts/nav.blade.php - Rippmenüüsse link juurde "Raamatute import"
 	<a class="dropdown-item" href="{{ route('admin.books.import') }}">
-	
 AdminBooksController.php
 	public function importForm(){...}
 	public function import(Request $request){...}
-	
 Web.php	- Routes update
 [AdminBookController::class, 'importForm']
 [AdminBookController::class, 'import']
