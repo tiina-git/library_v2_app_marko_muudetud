@@ -87,10 +87,12 @@ Web.php	- Routes update, bookslist.blade
 	[BookController::class, 'userIndex']
 	
 4. Raamatute otsimine, min 3 märki
-app/Http/Controllers/Public/SearchController.php
+Uus kontroller "Otsing" 
+    app/Http/Controllers/Public/SearchController.php
 Uus fail "Otsing" 
     resources/views/public/search.blade.php
 	    public function index(Request $request) {...}
+resources/views/layouts/nav.blade.php - Mnüüsse link juurde "Otsing"
 Web.php	- Routes update, search.blade
  [SearchController::class, 'index']
 	
